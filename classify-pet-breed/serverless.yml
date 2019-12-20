@@ -1,0 +1,49 @@
+service: classify-pet-breed
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: us-west-2
+
+include:
+  - resources/**
+
+functions:
+  classify:
+    handler: classify.classifyHandler
+    timeout: 30
+    events:
+      - http:
+          path: classify
+          method: POST
+
+custom:
+  pythonRequirements:
+    slim: true
+    strip: false
+    dockerizePip: true
+    zip: true
+    noDeploy:
+      - boto3
+      - botocore
+      - docutils
+      - jmespath
+      - pip
+      - python-dateutil
+      - s3transfer
+      - setuptools
+      - six
+      - tensorboard
+  apigwBinary:
+    types:           #list of mime-types
+      - 'multipart/form-data'
+      - 'image/png'
+      - 'image/jpeg'
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+  - serverless-apigw-binary 
+
+
